@@ -15,6 +15,8 @@ import java.util.stream.Collectors;
 public class MealsUtil {
     public static final int CALORIES_PER_DAY = 2000;
 
+    private static SearchMethod searchMethod;
+
     public static List<Meal> meals = Arrays.asList(
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 10, 0), "Завтрак", 500),
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 30, 13, 0), "Обед", 1000),
@@ -25,14 +27,12 @@ public class MealsUtil {
             new Meal(LocalDateTime.of(2020, Month.JANUARY, 31, 20, 0), "Ужин", 410)
     );
 
-    private static GetMethod searchMethod;
-
     public static void main(String[] args) {
         List<MealTo> mealsTo = filteredByStreams(meals, LocalTime.of(7, 0), LocalTime.of(12, 0), CALORIES_PER_DAY);
         mealsTo.forEach(System.out::println);
     }
 
-    public static void setSearchMethod(GetMethod searchMethod) {
+    public static void setSearchMethod(SearchMethod searchMethod) {
         MealsUtil.searchMethod = searchMethod;
     }
 
@@ -45,6 +45,6 @@ public class MealsUtil {
     }
 
     public static MealTo createTo(Meal meal, boolean excess) {
-        return new MealTo(meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
+        return new MealTo(meal.getId(), meal.getDateTime(), meal.getDescription(), meal.getCalories(), excess);
     }
 }

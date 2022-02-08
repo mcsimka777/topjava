@@ -8,6 +8,6 @@ import java.time.LocalTime;
 import java.util.List;
 import java.util.Map;
 
-public interface GetMethod {
+public interface SearchMethod {
     List<MealTo> makeList(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay, Map<LocalDate, Integer> caloriesSumByDate);
 }

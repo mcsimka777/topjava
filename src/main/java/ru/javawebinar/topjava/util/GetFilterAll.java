@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class GetAll implements GetMethod {
+public class GetFilterAll implements SearchMethod {
 
     @Override
     public List<MealTo> makeList(List<Meal> meals, LocalTime startTime, LocalTime endTime, int caloriesPerDay, Map<LocalDate, Integer> caloriesSumByDate) {
