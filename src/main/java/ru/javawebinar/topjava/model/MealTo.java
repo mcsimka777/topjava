@@ -5,7 +5,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 
 public class MealTo {
-    private Integer id;
+    private final int id;
+
     private final LocalDateTime dateTime;
 
     private final String description;
@@ -22,12 +23,8 @@ public class MealTo {
         this.excess = excess;
     }
 
-    public Integer getId() {
+    public int getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
     public LocalDateTime getDateTime() {

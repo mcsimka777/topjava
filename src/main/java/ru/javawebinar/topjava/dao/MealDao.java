@@ -1,17 +1,18 @@
 package ru.javawebinar.topjava.dao;
 
+import org.jetbrains.annotations.NotNull;
 import ru.javawebinar.topjava.model.Meal;
 
 import java.util.List;
 
 public interface MealDao {
-    void create(Meal meal);
+    Meal create(Meal meal);
 
-    Meal get(Integer id);
+    Meal get(@NotNull Integer id);
 
-    void delete(Integer id);
+    void delete(@NotNull Integer id);
 
-    void update(Integer id, Meal meal);
+    Meal update(Meal meal);
 
     List<Meal> getAll();
 }

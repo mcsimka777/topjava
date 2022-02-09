@@ -1,40 +1,33 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
+import ru.javawebinar.topjava.dao.MapMealDao;
 import ru.javawebinar.topjava.dao.MealDao;
-import ru.javawebinar.topjava.dao.MealDaoImplMap;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
-import ru.javawebinar.topjava.util.GetFilterAll;
-import ru.javawebinar.topjava.util.GetFilterByTime;
 import ru.javawebinar.topjava.util.MealsUtil;
-import ru.javawebinar.topjava.util.SearchMethod;
 
+import javax.servlet.ServletConfig;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 import static org.slf4j.LoggerFactory.getLogger;
 
-
 public class MealServlet extends HttpServlet {
     private static final Logger log = getLogger(MealServlet.class);
     private final String INSERT_OR_EDIT = "/meal.jsp";
-    private final String LIST_USER = "/meals.jsp";
-    private final SearchMethod SEARCH_ALL = new GetFilterAll();
-    private final SearchMethod SEARCH_BY_TIME = new GetFilterByTime();
-    private final DateTimeFormatter formatter = DateTimeFormatter.ISO_DATE_TIME;
-    private final MealDao dao;
+    private final String LIST_MEAL = "/meals.jsp";
+    private MealDao dao;
 
-    public MealServlet() {
-        super();
-        dao = new MealDaoImplMap();
+    @Override
+    public void init(ServletConfig config) throws ServletException {
+        super.init(config);
+        dao = new MapMealDao();
     }
 
     @Override
@@ -48,19 +41,18 @@ public class MealServlet extends HttpServlet {
                 break;
             case "edit":
                 forward = INSERT_OR_EDIT;
-                request.setAttribute("meal", dao.get(Integer.valueOf(request.getParameter("id"))));
-                log.debug("EDIT: " + dao.get(Integer.valueOf(request.getParameter("id"))));
+                request.setAttribute("meal", dao.get(parseId(request)));
+                log.debug("EDIT {} ", dao.get(parseId(request)));
                 break;
             case "delete":
-                log.debug("DELETE: " + dao.get(Integer.valueOf(request.getParameter("id"))));
-                dao.delete(Integer.valueOf(request.getParameter("id")));
+                log.debug("DELETE {}", dao.get(parseId(request)));
+                dao.delete(parseId(request));
                 response.sendRedirect("meals");
                 return;
             default:
                 log.debug("redirect to meals");
-                forward = LIST_USER;
-                MealsUtil.setSearchMethod(SEARCH_ALL);
-                List<MealTo> mealsTo = MealsUtil.filteredByStreams(dao.getAll(), LocalTime.of(7, 0), LocalTime.of(12, 0), MealsUtil.CALORIES_PER_DAY);
+                forward = LIST_MEAL;
+                List<MealTo> mealsTo = MealsUtil.unfiltered(dao.getAll(), MealsUtil.CALORIES_PER_DAY);
                 request.setAttribute("mealsTo", mealsTo);
         }
         request.getRequestDispatcher(forward).forward(request, response);
@@ -69,27 +61,23 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        Meal meal = new Meal();
-        try {
-            meal.setDateTime(LocalDateTime.parse(req.getParameter("date"), formatter));
-            meal.setCalories(Integer.parseInt(req.getParameter("calories")));
-            meal.setDescription(req.getParameter("description"));
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        Meal meal = new Meal(LocalDateTime.parse(req.getParameter("date"))
+                , req.getParameter("description")
+                , Integer.parseInt(req.getParameter("calories"))
+        );
         String id = req.getParameter("id");
-        if (id != null) {
-            if (id.equals("")) {
-                dao.create(meal);
-                log.debug("INSERT: " + meal);
-            } else {
-                dao.update(Integer.parseInt(id), meal);
-                log.debug("UPDATE: " + meal);
-            }
+        if (id.isEmpty()) {
+            Meal newMeal = dao.create(meal);
+            log.debug("INSERT {}", newMeal);
         } else {
-            dao.create(meal);
-            log.debug("INSERT: " + meal);
+            meal.setId(parseId(req));
+            dao.update(meal);
+            log.debug("UPDATE {}", meal);
         }
         resp.sendRedirect("meals");
+    }
+
+    private int parseId(HttpServletRequest req) {
+        return Integer.parseInt(req.getParameter("id"));
     }
 }
