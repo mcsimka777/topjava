@@ -1,7 +1,7 @@
 package ru.javawebinar.topjava.web;
 
 import org.slf4j.Logger;
-import ru.javawebinar.topjava.dao.MapMealDao;
+import ru.javawebinar.topjava.dao.InMemoryMealDao;
 import ru.javawebinar.topjava.dao.MealDao;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.model.MealTo;
@@ -27,7 +27,7 @@ public class MealServlet extends HttpServlet {
     @Override
     public void init(ServletConfig config) throws ServletException {
         super.init(config);
-        dao = new MapMealDao();
+        dao = new InMemoryMealDao();
     }
 
     @Override
@@ -38,15 +38,18 @@ public class MealServlet extends HttpServlet {
         switch (action.toLowerCase()) {
             case "insert":
                 forward = INSERT_OR_EDIT;
+                Meal newMeal = new Meal(null, LocalDateTime.now().withNano(0).withSecond(0), "", 1000);
+                request.setAttribute("meal", newMeal);
                 break;
             case "edit":
                 forward = INSERT_OR_EDIT;
+                Meal meal = dao.get(parseId(request));
                 request.setAttribute("meal", dao.get(parseId(request)));
-                log.debug("EDIT {} ", dao.get(parseId(request)));
+                log.debug("EDIT {} ", meal);
                 break;
             case "delete":
-                log.debug("DELETE {}", dao.get(parseId(request)));
                 dao.delete(parseId(request));
+                log.debug("DELETE id={}", parseId(request));
                 response.sendRedirect("meals");
                 return;
             default:
@@ -61,18 +64,17 @@ public class MealServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         req.setCharacterEncoding("UTF-8");
-        Meal meal = new Meal(LocalDateTime.parse(req.getParameter("date"))
-                , req.getParameter("description")
-                , Integer.parseInt(req.getParameter("calories"))
-        );
         String id = req.getParameter("id");
-        if (id.isEmpty()) {
-            Meal newMeal = dao.create(meal);
+        Meal meal = new Meal(id.isEmpty() ? null : parseId(req), LocalDateTime.parse(req.getParameter("date")),
+                req.getParameter("description"),
+                Integer.parseInt(req.getParameter("calories"))
+        );
+        Meal newMeal = dao.save(meal);
+
+        if (meal.getId() == null) {
             log.debug("INSERT {}", newMeal);
         } else {
-            meal.setId(parseId(req));
-            dao.update(meal);
-            log.debug("UPDATE {}", meal);
+            log.debug("UPDATE {}", newMeal);
         }
         resp.sendRedirect("meals");
     }

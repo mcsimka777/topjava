@@ -1,6 +1,5 @@
 package ru.javawebinar.topjava.dao;
 
-import org.jetbrains.annotations.NotNull;
 import ru.javawebinar.topjava.model.Meal;
 import ru.javawebinar.topjava.util.MealsUtil;
 
@@ -10,37 +9,31 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class MapMealDao implements MealDao {
+public class InMemoryMealDao implements MealDao {
     private AtomicInteger counter = new AtomicInteger();
 
     private Map<Integer, Meal> mealMap = new ConcurrentHashMap<>();
 
     {
-        MealsUtil.meals.forEach(this::create);
+        MealsUtil.meals.forEach(this::save);
     }
 
     @Override
-    public Meal create(Meal meal) {
-        int id = counter.getAndIncrement();
-        meal.setId(id);
-        mealMap.put(id, meal);
+    public Meal save(Meal meal) {
+        if (meal.getId() == null) {
+            meal.setId(counter.getAndIncrement());
+        }
+        return mealMap.put(meal.getId(), meal);
+    }
+
+    @Override
+    public Meal get(int id) {
         return mealMap.get(id);
     }
 
     @Override
-    public Meal get(@NotNull Integer id) {
-        return mealMap.get(id);
-    }
-
-    @Override
-    public void delete(@NotNull Integer id) {
+    public void delete(int id) {
         mealMap.remove(id);
-    }
-
-    @Override
-    public Meal update(Meal meal) {
-        mealMap.replace(meal.getId(), meal);
-        return mealMap.get(meal.getId());
     }
 
     public List<Meal> getAll() {

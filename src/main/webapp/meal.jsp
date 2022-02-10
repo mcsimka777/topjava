@@ -1,4 +1,4 @@
-<%@ page import="java.time.LocalDateTime" %>
+<jsp:useBean id="meal" scope="request" type="ru.javawebinar.topjava.model.Meal"/>
 <%@ page pageEncoding="UTF-8" contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <html lang="ru">
@@ -15,10 +15,10 @@
             <td>Date</td>
             <td>
                 <input type="hidden" name="id" value="${meal.id}"/>
-                <c:set var="currentDate" value="<%=LocalDateTime.now().withNano(0).withSecond(0) %>"/>
+
                 <input
                         type="datetime-local" name="date"
-                        value="${meal.dateTime == null ? currentDate : meal.dateTime}"/> <br/>
+                        value="${meal.dateTime}"/> <br/>
             </td>
         </tr>
         <tr>
@@ -33,7 +33,7 @@
             <td>Calories</td>
             <td>
                 <input
-                        type="text" name="calories"
+                        type="number" name="calories"
                         value="${meal.calories}"/> <br/>
             </td>
         </tr>
