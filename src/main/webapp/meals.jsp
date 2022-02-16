@@ -19,25 +19,26 @@
 <body>
 <h3><a href="index.html">Home</a></h3>
 <hr/>
-<h2>Meals for ${userId}</h2>
+<h2>Meals</h2>
 <table>
-    <thead>От даты (включая)</thead>
-    <thead>До даты (включая)</thead>
-    <thead>От времени (включая)</thead>
-    <thead>До времени (исключая)</thead>
+    <th>От даты (включая)</th>
+    <th>До даты (включая)</th>
+    <th>От времени (включая)</th>
+    <th>До времени (исключая)</th>
     <form method="post" action="meals">
+        <input type="hidden" name="action" value="filter">
         <tr>
             <td>
-                <input type="date" value="${meal.description}" size=15 name="description1">
+                <input type="date" value="${startDate}" size=15 name="startDate">
             </td>
             <td>
-                <input type="date" value="${meal.description}" size=15 name="description2">
+                <input type="date" value="${endDate}" size=15 name="endDate">
             </td>
             <td>
-                <input type="time" value="${meal.description}" size=15 name="description3">
+                <input type="time" value="${startTime}" size=15 name="startTime">
             </td>
             <td>
-                <input type="time" value="${meal.description}" size=15 name="description4">
+                <input type="time" value="${endTime}" size=15 name="endTime">
             </td>
         </tr>
         <tr>

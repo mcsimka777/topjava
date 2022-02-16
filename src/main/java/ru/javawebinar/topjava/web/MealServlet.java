@@ -4,7 +4,6 @@ import org.springframework.beans.BeansException;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 import ru.javawebinar.topjava.model.Meal;
-import ru.javawebinar.topjava.util.MealsUtil;
 import ru.javawebinar.topjava.web.meal.MealRestController;
 
 import javax.servlet.ServletException;
@@ -12,13 +11,15 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 public class MealServlet extends HttpServlet {
     private MealRestController mealRestController;
-    private ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
+    private final ConfigurableApplicationContext appCtx = new ClassPathXmlApplicationContext("spring/spring-app.xml");
 
     @Override
     public void init() {
@@ -32,31 +33,48 @@ public class MealServlet extends HttpServlet {
     @Override
     public void destroy() {
         appCtx.close();
+        super.destroy();
     }
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         request.setCharacterEncoding("UTF-8");
-        String id = request.getParameter("id");
-
-        Meal meal = new Meal(id.isEmpty() ? null : Integer.valueOf(id),
-                LocalDateTime.parse(request.getParameter("dateTime")),
-                request.getParameter("description"),
-                Integer.parseInt(request.getParameter("calories")));
-
-        if (meal.isNew()) {
-            mealRestController.create(meal);
-        } else {
-            meal.setUserId(Integer.parseInt(request.getParameter("userid")));
-            mealRestController.update(meal);
+        String action = request.getParameter("action");
+        switch (action == null ? "all" : action) {
+            case "filter":
+                LocalDate startDate = (request.getParameter("startDate").length() > 0)
+                        ? LocalDate.parse(request.getParameter("startDate")) : null;
+                LocalDate endDate = (request.getParameter("endDate").length() > 0)
+                        ? LocalDate.parse(request.getParameter("endDate")) : null;
+                LocalTime startTime = (request.getParameter("startTime").length() > 0)
+                        ? LocalTime.parse(request.getParameter("startTime")) : null;
+                LocalTime endTime = (request.getParameter("endTime").length() > 0)
+                        ? LocalTime.parse(request.getParameter("endTime")) : null;
+                request.setAttribute("startDate", startDate);
+                request.setAttribute("endDate", endDate);
+                request.setAttribute("startTime", startTime);
+                request.setAttribute("endTime", endTime);
+                request.setAttribute("meals", mealRestController.getFiltered(startTime, endTime, startDate, endDate));
+                request.getRequestDispatcher("/meals.jsp").forward(request, response);
+                break;
+            default:
+                String id = request.getParameter("id");
+                Meal meal = new Meal(LocalDateTime.parse(request.getParameter("dateTime")),
+                        request.getParameter("description"),
+                        Integer.parseInt(request.getParameter("calories")));
+                if (id.isEmpty()) {
+                    mealRestController.create(meal);
+                } else {
+                    mealRestController.update(meal, Integer.parseInt(id));
+                }
+                response.sendRedirect("meals");
+                break;
         }
-        response.sendRedirect("meals");
     }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String action = request.getParameter("action");
-
         switch (action == null ? "all" : action) {
             case "delete":
                 int id = getId(request);
@@ -73,11 +91,7 @@ public class MealServlet extends HttpServlet {
                 break;
             case "all":
             default:
-                if (request.getParameter("userid") != null) {
-                    mealRestController.setUserId(Integer.parseInt(request.getParameter("userid")));
-                }
-                request.setAttribute("userId", mealRestController.getUserId());
-                request.setAttribute("meals", mealRestController.getTos(MealsUtil.DEFAULT_CALORIES_PER_DAY));
+                request.setAttribute("meals", mealRestController.getAll());
                 request.getRequestDispatcher("/meals.jsp").forward(request, response);
                 break;
         }

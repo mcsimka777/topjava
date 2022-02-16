@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Repository;
 import ru.javawebinar.topjava.model.AbstractNamedEntity;
+import ru.javawebinar.topjava.model.Role;
 import ru.javawebinar.topjava.model.User;
 import ru.javawebinar.topjava.repository.UserRepository;
 
@@ -18,7 +19,14 @@ import java.util.stream.Collectors;
 public class InMemoryUserRepository implements UserRepository {
     private static final Logger log = LoggerFactory.getLogger(InMemoryUserRepository.class);
     private final Map<Integer, User> userRepository = new ConcurrentHashMap<>();
-    private AtomicInteger counter = new AtomicInteger(0);
+    private final AtomicInteger counter = new AtomicInteger(0);
+
+    {
+        save(new User(null, "max", "zmax@vsi.ru", "dsa", Role.USER));
+        save(new User(null, "max", "max@vsi.ru", "dsa", Role.USER));
+        save(new User(null, "max", "amax@vsi.ru", "dsa", Role.USER));
+        save(new User(null, "leo", "vmax@vsi.ru", "dsa", Role.USER));
+    }
 
     @Override
     public boolean delete(int id) {
@@ -46,13 +54,15 @@ public class InMemoryUserRepository implements UserRepository {
     public List<User> getAll() {
         log.info("getAll");
         return userRepository.values().stream()
-                .sorted(Comparator.comparing(AbstractNamedEntity::getName)).collect(Collectors.toList());
+                .sorted(Comparator.comparing(User::getEmail))
+                .sorted(Comparator.comparing(AbstractNamedEntity::getName))
+                .collect(Collectors.toList());
     }
 
     @Override
     public User getByEmail(String email) {
         log.info("getByEmail {}", email);
         return userRepository.values().stream()
-                .filter(u -> u.getEmail().equals(email)).findAny().orElse(null);
+                .filter(u -> u.getEmail().equalsIgnoreCase(email)).findAny().orElse(null);
     }
 }
