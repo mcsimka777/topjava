@@ -1,4 +1,4 @@
-package ru.javawebinar.topjava.web.user;
+package ru.javawebinar.topjava;
 
 import org.junit.rules.ExternalResource;
 import org.junit.rules.Stopwatch;
@@ -16,8 +16,8 @@ public class TestTiming {
     public static final Stopwatch STOPWATCH = new Stopwatch() {
         @Override
         protected void finished(long nanos, Description description) {
-            String result = String.format("%s - %d", description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
-            results.append(result).append("ms").append('\n');
+            String result = String.format("%-40s %5d", description.getMethodName(), TimeUnit.NANOSECONDS.toMillis(nanos));
+            results.append(result).append(" ms").append('\n');
             log.info(result + " ms\n");
         }
     };
