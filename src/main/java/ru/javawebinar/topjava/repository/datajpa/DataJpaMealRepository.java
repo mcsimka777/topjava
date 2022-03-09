@@ -20,7 +20,6 @@ public class DataJpaMealRepository implements MealRepository {
     }
 
     @Transactional
-    @Modifying
     @Override
     public Meal save(Meal meal, int userId) {
         meal.setUser(crudUserRepository.getById(userId));
