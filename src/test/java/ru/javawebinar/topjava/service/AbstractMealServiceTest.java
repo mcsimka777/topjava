@@ -117,9 +117,4 @@ public abstract class AbstractMealServiceTest extends AbstractServiceTest {
         validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "Description", 9), USER_ID));
         validateRootCause(ConstraintViolationException.class, () -> service.create(new Meal(null, of(2015, Month.JUNE, 1, 18, 0), "Description", 5001), USER_ID));
     }
-
-    private boolean isJdbc() {
-        return Arrays.stream(env.getActiveProfiles()).anyMatch(s -> s.equals(Profiles.JDBC));
-    }
-
 }
