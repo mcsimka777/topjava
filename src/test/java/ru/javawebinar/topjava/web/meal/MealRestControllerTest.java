@@ -14,7 +14,6 @@ import ru.javawebinar.topjava.web.AbstractControllerTest;
 import ru.javawebinar.topjava.web.SecurityUtil;
 import ru.javawebinar.topjava.web.json.JsonUtil;
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -32,7 +31,7 @@ class MealRestControllerTest extends AbstractControllerTest {
     private static final String startDate = "2020-01-31T00:00:00";
     private static final String endDate = "2020-01-31T15:00:00";
     private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
-    private static final List<Meal> filteredMeals = List.of(meal7, meal6, meal5, meal4);
+
     @Autowired
     private MealService mealService;
 
@@ -89,12 +88,11 @@ class MealRestControllerTest extends AbstractControllerTest {
 
     @Test
     void getFiltered() throws Exception {
-        perform(MockMvcRequestBuilders.get(REST_URL + "filter?" +
-                "startDate=" + LocalDate.parse(startDate, formatter) +
-                "&endDate=" + LocalDate.parse(endDate, formatter) +
-                "&startTime=" + LocalTime.parse(startDate, formatter) +
-                "&endTime=" + LocalTime.parse(endDate, formatter)
-        ))
+        List<Meal> filteredMeals = List.of(meal7, meal6, meal5, meal4);
+        perform(MockMvcRequestBuilders.get(REST_URL + "filter")
+                .param("startDate", startDate)
+                .param("endDate", endDate)
+        )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getFilteredTos(filteredMeals,
@@ -102,5 +100,4 @@ class MealRestControllerTest extends AbstractControllerTest {
                         LocalTime.parse(startDate, formatter),
                         LocalTime.parse(endDate, formatter))));
     }
-
 }
