@@ -28,9 +28,8 @@ import static ru.javawebinar.topjava.UserTestData.USER_ID;
 class MealRestControllerTest extends AbstractControllerTest {
 
     private static final String REST_URL = MealRestController.REST_URL + '/';
-    private static final String startDate = "2020-01-31T00:00:00";
-    private static final String endDate = "2020-01-31T15:00:00";
-    private static final DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE_TIME;
+    private static final String START_DATETIME = "2020-01-31T00:00:00";
+    private static final String END_DATETIME = "2020-01-31T15:00:00";
 
     @Autowired
     private MealService mealService;
@@ -90,14 +89,14 @@ class MealRestControllerTest extends AbstractControllerTest {
     void getFiltered() throws Exception {
         List<Meal> filteredMeals = List.of(meal7, meal6, meal5, meal4);
         perform(MockMvcRequestBuilders.get(REST_URL + "filter")
-                .param("startDate", startDate)
-                .param("endDate", endDate)
+                .param("startDate", START_DATETIME)
+                .param("endDate", END_DATETIME)
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getFilteredTos(filteredMeals,
                         SecurityUtil.authUserCaloriesPerDay(),
-                        LocalTime.parse(startDate, formatter),
-                        LocalTime.parse(endDate, formatter))));
+                        LocalTime.parse(START_DATETIME, DateTimeFormatter.ISO_LOCAL_TIME),
+                        LocalTime.parse(END_DATETIME, DateTimeFormatter.ISO_LOCAL_TIME))));
     }
 }

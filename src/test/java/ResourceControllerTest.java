@@ -8,7 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class ResourceControllerTest extends AbstractControllerTest {
 
-    private final String TEXT_CSS = "text/css;charset=UTF-8";
+    private static final String TEXT_CSS = "text/css;charset=UTF-8";
 
     @Test
     void requestResource() throws Exception {
