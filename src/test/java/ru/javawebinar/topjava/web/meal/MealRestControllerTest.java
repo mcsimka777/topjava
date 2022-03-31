@@ -89,14 +89,14 @@ class MealRestControllerTest extends AbstractControllerTest {
     void getFiltered() throws Exception {
         List<Meal> filteredMeals = List.of(meal7, meal6, meal5, meal4);
         perform(MockMvcRequestBuilders.get(REST_URL + "filter")
-                .param("startDate", START_DATETIME)
-                .param("endDate", END_DATETIME)
+                .param("startDateTime", START_DATETIME)
+                .param("endDateTime", END_DATETIME)
         )
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
                 .andExpect(MEAL_TO_MATCHER.contentJson(MealsUtil.getFilteredTos(filteredMeals,
                         SecurityUtil.authUserCaloriesPerDay(),
-                        LocalTime.parse(START_DATETIME, DateTimeFormatter.ISO_LOCAL_TIME),
-                        LocalTime.parse(END_DATETIME, DateTimeFormatter.ISO_LOCAL_TIME))));
+                        LocalTime.parse(START_DATETIME, DateTimeFormatter.ISO_LOCAL_DATE_TIME),
+                        LocalTime.parse(END_DATETIME, DateTimeFormatter.ISO_LOCAL_DATE_TIME))));
     }
 }
