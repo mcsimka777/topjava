@@ -1,6 +1,5 @@
 <%@page contentType="text/html" pageEncoding="UTF-8" %>
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
-<%@ taglib prefix="c" uri="http://java.sun.com/jstl/core" %>
 
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
@@ -20,5 +19,4 @@
     <script src="webjars/datatables/1.11.4/js/jquery.dataTables.min.js" defer></script>
     <script src="webjars/datatables/1.11.4/js/dataTables.bootstrap4.min.js" defer></script>
     <script src="webjars/noty/3.1.4/lib/noty.min.js" defer></script>
-    <script src="webjars/momentjs/2.29.1/moment.js" defer></script>
 </head>

@@ -4,11 +4,14 @@
 <%@ taglib prefix="spring" uri="http://www.springframework.org/tags" %>
 
 <html>
+
+<jsp:include page="fragments/i18n.jsp"/>
 <jsp:include page="fragments/headTag.jsp"/>
 <body>
 <script src="resources/js/topjava.common.js" defer></script>
 <script src="resources/js/topjava.users.js" defer></script>
 <jsp:include page="fragments/bodyHeader.jsp"/>
+<jsp:include page="fragments/i18n.jsp"/>
 
 <div class="jumbotron pt-4">
     <div class="container">
@@ -79,7 +82,6 @@
 <jsp:include page="fragments/footer.jsp"/>
 </body>
 <script type="text/javascript">
-    const i18n = [];
     i18n["addTitle"] = '<spring:message code="user.add"/>';
     i18n["editTitle"] = '<spring:message code="user.edit"/>';
 </script>

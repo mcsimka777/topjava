@@ -32,8 +32,15 @@ $(function () {
             "columns": [
                 {
                     "data": "dateTime",
-                    "render": function (data) {
-                        return moment(data).format('yyyy-MM-DD HH:mm')
+                    "render": function (date, type) {
+                        if (type == 'display') {
+                            var dateObj = new Date(date);
+                            return '<span>' + dateObj.toISOString().substring(0, 10)
+                                + ' '
+                                + dateObj.toISOString().substring(11, 16)
+                                + '</span>';
+                        }
+                        return date;
                     }
                 },
                 {
@@ -60,12 +67,7 @@ $(function () {
                 ]
             ],
             "createdRow": function (row, data, dataIndex) {
-                if (data.excess) {
-                    $(row).attr("data-meal-excess", true);
-                } else {
-                    $(row).attr("data-meal-excess", false);
-                }
-
+                $(row).attr("data-meal-excess", data.excess);
             }
         })
     );
